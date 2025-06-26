@@ -1,0 +1,113 @@
+"use client";
+import { Tooltip } from "@radix-ui/react-tooltip";
+import { ChevronLeft, ChevronRight, LucideIcon } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+import Link from "next/link";
+import { Button } from "./ui/button";
+import { cmsNavItems } from "@/lib/data";
+
+interface NavItemProps {
+  href: string;
+  label: string;
+  icon: LucideIcon | null;
+  isCollapsed: boolean;
+  onClick: () => void;
+}
+
+const NavItem = ({
+  href,
+  icon: Icon,
+  label,
+  isCollapsed,
+  onClick,
+}: NavItemProps) => {
+  const pathName = usePathname();
+  const isActive = pathName === href;
+
+  return isCollapsed ? (
+    <TooltipProvider delayDuration={0}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Link
+            href={href}
+            onClick={onClick}
+            className={`flex flex-col h-10 w-10 items-center justify-center rounded-md ${
+              isActive ? "bg-orange-400" : "hover:bg-gray-400"
+            }`}
+          >
+            {Icon && <Icon className="h-5 w-5" />}
+            <span className="sr-only">{label}</span>
+          </Link>
+        </TooltipTrigger>
+
+        <TooltipContent side="right" className="font-medium">
+          {label}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  ) : (
+    <Link
+      href={href}
+      onClick={onClick}
+      className={`flex items-center gap-3 rounded-md p-3 font-medium ${
+        isActive ? "bg-orange-400" : "hover:bg-gray-400"
+      }`}
+    >
+      {Icon && <Icon className="h-5 w-5" />}
+      <span>{label}</span>
+    </Link>
+  );
+};
+
+const SideNav = () => {
+  const [isCollapsed, setIsCollapsed] = useState(true);
+
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
+  return (
+    <div
+      className={`fixed top-0 text-white flex flex-col border transition-all duration-300 backdrop-blur-xl z-20 bg-black min-h-screen ${
+        isCollapsed ? "w-16" : "w-64"
+      }`}
+    >
+      <div className="flex items-center justify-center h-16 border-b p-3">
+        {!isCollapsed && (
+          <Link href="/" className="flex items-center gap-2 ">
+            <Button variant="ghost">cms</Button>
+          </Link>
+        )}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleSidebar}
+          className="ml-auto"
+        >
+          {isCollapsed ? (
+            <ChevronRight className="h-5 w-5" />
+          ) : (
+            <ChevronLeft className="h-5 w-5" />
+          )}
+          <span className="sr-only">Toggle Sidebar</span>
+        </Button>
+      </div>
+
+      <nav className="flex flex-1 flex-col overflow-y-auto ">
+        {cmsNavItems.map((item) => (
+          <NavItem
+            key={item.label}
+            href={item.href}
+            label={item.label}
+            icon={item.icon}
+            isCollapsed={isCollapsed}
+            onClick={() => {}}
+          />
+        ))}
+      </nav>
+    </div>
+  );
+};
+export default SideNav;
