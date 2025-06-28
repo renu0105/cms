@@ -32,7 +32,7 @@ interface ProjectModalProps {
   onClose: () => void;
   mode: "Create" | "Edit";
   project?: Project | null;
-  onSuccess?: () => void;
+  onSuccess?: (project: Project) => void;
 }
 
 const ProjectModal: React.FC<ProjectModalProps> = ({
@@ -44,7 +44,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    id: project?.id || "",
+    id: project && project.id ? project.id : undefined,
     title: project?.title || "",
     description: project?.description || " ",
     url: project?.url || "",
@@ -57,7 +57,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setFormData({
-        id: project?.id || "",
+        id: project && project.id ? project.id : undefined,
         title: project?.title || "",
         description: project?.description || "",
         url: project?.url || "",
@@ -83,17 +83,17 @@ const ProjectModal: React.FC<ProjectModalProps> = ({
 
     setIsLoading(true);
     try {
-      const res = await updateProject(project.id, { ...formData });
+      const res = await updateProject({ ...formData });
       if (res.error) {
         toast.error(res.error);
       } else {
         toast.success("Project updated successfully");
-        onSuccess?.();
+        onSuccess?.(res); // Pass updated project to parent
         onClose();
       }
     } catch (error) {
       console.log(error);
-      toast.error("Failed to create Project");
+      toast.error("Failed to update Project");
     } finally {
       setIsLoading(false);
     }
@@ -108,8 +108,12 @@ const ProjectModal: React.FC<ProjectModalProps> = ({
       if (response.error) {
         toast.error(response.error);
       } else {
+        setFormData({
+          ...formData,
+          id: response.id,
+        });
         toast.success("Project created successfully");
-        onSuccess?.();
+        onSuccess?.(response); // Pass new project to parent
         onClose();
       }
     } catch (error) {
@@ -130,7 +134,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({
         toast.error(res.error);
       } else {
         toast.success("Project successfully deleted");
-        onSuccess?.();
+        onSuccess?.(project); // Optionally pass deleted project
         onClose();
       }
     } catch (error) {

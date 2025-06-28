@@ -7,13 +7,14 @@ import ProjectModal from "@/components/Project-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 // import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { getProject } from "@/hooks/actions/project-actions";
+import { getProject, updateProject } from "@/hooks/actions/project-actions";
 import { Project } from "@/lib/generated/prisma";
 import { Input } from "@/components/ui/input";
 
 export default function CmsHomePage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [modalMode, setModalMode] = useState<"Create" | "Edit" | null>(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -40,8 +41,16 @@ export default function CmsHomePage() {
     fetchProjects();
   }, []);
 
-  const handleModalSuccess = () => {
-    fetchProjects();
+  const handleModalSuccess = (updatedProject: Project) => {
+    if (modalMode === "Edit") {
+      setProjects((prevProjects) =>
+        prevProjects.map((proj) =>
+          proj.id === updatedProject.id ? updatedProject : proj
+        )
+      );
+    } else {
+      setProjects((prevProjects) => [updatedProject, ...prevProjects]);
+    }
     setModalMode(null);
     setSelectedProject(null);
   };
@@ -61,13 +70,16 @@ export default function CmsHomePage() {
     setSelectedProject(null);
   };
 
-  const filteredProjects = projects.filter((project) =>
-    project.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleSearch = () => {
+    const filtered = projects.filter((project) =>
+      project.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredProjects(filtered);
+  };
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
+      <div className="flex justify-center items-center h-64 bg-">
         <Loader2 className="h-10 w-10 animate-spin" />
       </div>
     );
@@ -113,7 +125,9 @@ export default function CmsHomePage() {
 
         <CardContent className="flex flex-col text-black">
           <div className="flex items-center space-x-2 mb-4">
-            <Search className="w-4 h-4" />
+            <Button onClick={handleSearch}>
+              <Search className="w-4 h-4" />
+            </Button>
             <Input
               placeholder="Search books..."
               value={searchTerm}
@@ -121,12 +135,13 @@ export default function CmsHomePage() {
               className="max-w-sm"
             />
           </div>
-          {projects.map((project, index) => (
+          {(searchTerm ? filteredProjects : projects).map((project, index) => (
             <div
               key={index}
-              className={`mb-4 flex lg:flex-row flex-col gap-4 items-center lg:h-64 h-full rounded-2xl border p-4 bg-${
-                project.color ? project.color : "gray-100"
-              }`}
+              className="mb-4 flex lg:flex-row flex-col gap-4 items-center lg:h-64 h-full rounded-2xl border p-4"
+              style={{
+                backgroundColor: project.color ? project.color : "white",
+              }}
             >
               <img
                 src={project.img}

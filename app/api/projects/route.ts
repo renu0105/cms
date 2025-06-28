@@ -1,5 +1,5 @@
 import prisma from "@/hooks/prisma";
-import { verifySession } from "@/lib/server-utils";
+// import { verifySession } from "@/lib/server-utils";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     // }
 
     const data = await req.json();
-    console.log("project recieved data", data);
+    console.log("project received data", data);
     const { title, description, image, url, color } = data?.project;
     if (!title || !description || !image || !url) {
       return NextResponse.json(
@@ -94,6 +94,9 @@ export async function POST(req: NextRequest) {
         // },
       },
     });
+
+    const { id } = newProject;
+    console.log("id", id);
     return NextResponse.json(newProject, { status: 201 });
   } catch (error) {
     console.log(error);

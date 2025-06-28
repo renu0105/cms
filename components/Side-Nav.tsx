@@ -7,6 +7,7 @@ import { TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { cmsNavItems } from "@/lib/data";
+import { useClerk } from "@clerk/nextjs";
 
 interface NavItemProps {
   href: string;
@@ -25,6 +26,13 @@ const NavItem = ({
 }: NavItemProps) => {
   const pathName = usePathname();
   const isActive = pathName === href;
+  const { signOut } = useClerk();
+
+  const handleLogout = async () => {
+    if (label === "Logout") {
+      await signOut();
+    }
+  };
 
   return isCollapsed ? (
     <TooltipProvider delayDuration={0}>
@@ -32,7 +40,7 @@ const NavItem = ({
         <TooltipTrigger asChild>
           <Link
             href={href}
-            onClick={onClick}
+            onClick={handleLogout}
             className={`flex flex-col h-10 w-10 items-center justify-center rounded-md ${
               isActive ? "bg-orange-400" : "hover:bg-gray-400"
             }`}
@@ -50,7 +58,7 @@ const NavItem = ({
   ) : (
     <Link
       href={href}
-      onClick={onClick}
+      onClick={handleLogout}
       className={`flex items-center gap-3 rounded-md p-3 font-medium ${
         isActive ? "bg-orange-400" : "hover:bg-gray-400"
       }`}

@@ -50,3 +50,12 @@ export const cmsNavItems = [
   { label: "Admins", href: "/admins", icon: Shield },
   { label: "Logout", href: "/logout", icon: LogOut },
 ];
+
+export const techStackLanguage = [
+  "React",
+  "javascript",
+  "html",
+  "css",
+  "tailwind css",
+  "nextjs",
+];
