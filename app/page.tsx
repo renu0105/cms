@@ -60,7 +60,7 @@ export default function CmsHomePage() {
         )
       );
     } else {
-      setProjects((prevProjects) => [updatedProject, ...prevProjects]);
+      setProjects((prevProjects) => [...prevProjects, updatedProject]);
     }
     setModalMode(null);
     setSelectedProject(null);

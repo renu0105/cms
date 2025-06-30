@@ -19,7 +19,9 @@ export async function GET(req: NextRequest) {
       }
       return NextResponse.json(techStack, { status: 200 });
     } else {
-      const techStacks = await prisma.techStack.findMany();
+      const techStacks = await prisma.techStack.findMany({
+        orderBy: { id: "asc" }, // or createdAt: 'asc'
+      });
       return NextResponse.json(techStacks, { status: 200 });
     }
   } catch (err) {

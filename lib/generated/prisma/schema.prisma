@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Project {
+  id          Int         @id @default(autoincrement())
+  title       String
+  description String
+  url         String
+  color       String?
+  img         String
+  techStacks  TechStack[]
+  createdAt   DateTime    @default(now())
+  adminId     Int?
+  admin       Admin?      @relation(fields: [adminId], references: [id])
+}
+
+model Admin {
+  id       Int       @id @default(autoincrement())
+  name     String
+  projects Project[]
+}
+
+model TechStack {
+  id        Int      @id @default(autoincrement())
+  name      String
+  color     String?
+  projectId Int?
+  project   Project? @relation(fields: [projectId], references: [id])
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}

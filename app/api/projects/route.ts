@@ -25,6 +25,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(project, { status: 200 });
     } else {
       const projects = await prisma.project.findMany({
+        orderBy: { id: "asc" }, // or createdAt: 'asc'
+
         include: { techStacks: true },
       });
       return NextResponse.json(projects, { status: 200 });
