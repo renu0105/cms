@@ -34,11 +34,11 @@ export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
     console.log("data ", data);
-    const { name, projectId } = data;
-    if (!name) {
+    const { name, color } = data;
+    if (!name || !color) {
       return NextResponse.json(
         {
-          error: "Name is required",
+          error: "Name and color are required",
         },
         { status: 400 }
       );
@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
     const newTechStack = await prisma.techStack.create({
       data: {
         name,
+        color,
       },
     });
     const { id } = newTechStack;
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const data = await req.json();
-    const { name, id, projectId } = data;
+    const { name, id, color, projectId } = data;
 
     if (!id) {
       return NextResponse.json(
@@ -77,6 +78,7 @@ export async function PUT(req: NextRequest) {
       data: {
         name,
         projectId,
+        color,
       },
     });
     return NextResponse.json(techStack, { status: 200 });
@@ -90,13 +92,13 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const { searchParams } = await req.json();
+    const { searchParams } = await new URL(req.url);
     const id = searchParams.get("id");
     if (!id) {
       return NextResponse.json({ err: "id not found" }, { status: 400 });
     }
 
-    await prisma.techStack.delete({ where: { id } });
+    await prisma.techStack.delete({ where: { id: Number(id) } });
     return NextResponse.json(
       { message: "Successfully deleted" },
       { status: 200 }

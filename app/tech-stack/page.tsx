@@ -5,10 +5,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { getTechStack } from "@/hooks/actions/techStack-actions";
 import { TechStack } from "@/lib/generated/prisma";
-import { Loader, Search, SquarePen } from "lucide-react";
+import { useAuth } from "@clerk/nextjs";
+import { Loader2, Search, SquarePen } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const TechStacks = () => {
+  const { isSignedIn } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isSignedIn) {
+      router.replace("/login");
+    }
+  }, [isSignedIn, router]);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | boolean>(false);
@@ -76,26 +87,42 @@ const TechStacks = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center">
-        <Loader className="animate-spin h-10 w-10" />
+      <div className="flex flex-col items-center justify-center h-screen">
+        <Loader2 className="h-10 w-10 animate-spin text-blue-500 mb-4" />
+        <span className="text-gray-500 text-lg">Loading techStacks...</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div>
-        <h1>Something went wrong</h1>
-        <p>Please Try Again Later</p>
+      <div className="flex flex-col items-center justify-center h-screen">
+        <Card className="w-full max-w-md shadow-lg">
+          <CardContent className="flex flex-col items-center">
+            <div className="text-center mb-4">
+              <h3 className="text-xl font-semibold text-red-600 mb-2">
+                Something went wrong
+              </h3>
+              <p className="text-gray-500">
+                We couldn&apos;t load the techStack at this time.
+                <br />
+                Please try again later.
+              </p>
+            </div>
+            <Button onClick={() => window.location.reload()} variant="outline">
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
     <div>
-      <Card className="mt-10 h-screen my-28 ">
+      <Card className="mt-10 min-h-screen my-28  mx-10">
         <CardHeader className="text-black">
-          <CardTitle className="text-2xl">Tech-Stack</CardTitle>
+          <CardTitle className="text-3xl font-bold ">Tech-Stack</CardTitle>
           <div className=" flex justify-between my-4">
             <div className="flex">
               <Button onClick={() => filteredTechStacks}>
@@ -114,15 +141,17 @@ const TechStacks = () => {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="grid lg:grid-cols-4 grid-cols-2 gap-5">
+        <CardContent className="grid lg:grid-cols-3 grid-cols-2 gap-5">
           {filteredTechStacks.map((tech: TechStack) => (
             <div
               key={tech.id}
-              className="bg-amber-500 border-2 w-64 p-3 mx-auto h-fit rounded-xl text-center text-xl text-white font-bold flex justify-between"
+              className="border-2 lg:w-96 w-64 p-5 mx-auto h-fit rounded-xl text-center text-xl text-white font-bold flex justify-between"
+              style={{ backgroundColor: tech.color ? tech.color : "pink" }}
             >
               {tech.name}
               <Button
-                className="bg-white text-amber-500"
+                style={{ color: tech.color ? tech.color : "orange" }}
+                className="bg-white"
                 onClick={() => handleEdit(tech)}
               >
                 <SquarePen />

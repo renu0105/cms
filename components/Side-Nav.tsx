@@ -1,7 +1,7 @@
 "use client";
 import { Tooltip } from "@radix-ui/react-tooltip";
 import { ChevronLeft, ChevronRight, LucideIcon } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import Link from "next/link";
@@ -17,21 +17,17 @@ interface NavItemProps {
   onClick: () => void;
 }
 
-const NavItem = ({
-  href,
-  icon: Icon,
-  label,
-  isCollapsed,
-  onClick,
-}: NavItemProps) => {
+const NavItem = ({ href, icon: Icon, label, isCollapsed }: NavItemProps) => {
   const pathName = usePathname();
   const isActive = pathName === href;
   const { signOut } = useClerk();
+  const router = useRouter();
 
   const handleLogout = async () => {
     if (label === "Logout") {
       await signOut();
     }
+    router.push("/login");
   };
 
   return isCollapsed ? (
@@ -41,8 +37,10 @@ const NavItem = ({
           <Link
             href={href}
             onClick={handleLogout}
-            className={`flex flex-col h-10 w-10 items-center justify-center rounded-md ${
-              isActive ? "bg-orange-400" : "hover:bg-gray-400"
+            className={`flex flex-col h-16 w-16 items-center justify-center mx-auto  ${
+              isActive
+                ? "bg-orange-400"
+                : "hover:bg-white hover:text-orange-400"
             }`}
           >
             {Icon && <Icon className="h-5 w-5" />}
@@ -59,8 +57,8 @@ const NavItem = ({
     <Link
       href={href}
       onClick={handleLogout}
-      className={`flex items-center gap-3 rounded-md p-3 font-medium ${
-        isActive ? "bg-orange-400" : "hover:bg-gray-400"
+      className={`flex items-center gap-5 p-5 font-medium ${
+        isActive ? "bg-orange-400" : "hover:bg-white hover:text-orange-400"
       }`}
     >
       {Icon && <Icon className="h-5 w-5" />}
@@ -85,19 +83,21 @@ const SideNav = () => {
       <div className="flex items-center justify-center h-16 border-b p-3">
         {!isCollapsed && (
           <Link href="/" className="flex items-center gap-2 ">
-            <Button variant="ghost">cms</Button>
+            <Button variant="ghost" className="text-xl font-bold">
+              cms
+            </Button>
           </Link>
         )}
         <Button
           variant="ghost"
           size="icon"
           onClick={toggleSidebar}
-          className="ml-auto"
+          className="ml-auto "
         >
           {isCollapsed ? (
-            <ChevronRight className="h-5 w-5" />
+            <ChevronRight className="h-5 w-5 " />
           ) : (
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft className="h-5 w-5 " />
           )}
           <span className="sr-only">Toggle Sidebar</span>
         </Button>

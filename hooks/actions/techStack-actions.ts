@@ -3,6 +3,7 @@ import axios from "axios";
 interface TechStack {
   id: number | string;
   name: string;
+  color?: string;
   projectId?: string;
 }
 
@@ -50,9 +51,10 @@ export const getTechStackById = async (id: Number | string) => {
 
 export const updateTechStack = async (techStack: TechStack) => {
   try {
-    const res = await axios.put(`/api/techStack?id=${techStack.id}`, {
+    const res = await axios.put(`/api/techStacks?id=${techStack.id}`, {
       id: techStack.id,
       name: techStack.name,
+      color: techStack.color,
       projectId: techStack.projectId,
     });
     return res.data;

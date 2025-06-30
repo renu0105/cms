@@ -10,8 +10,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getProject, updateProject } from "@/hooks/actions/project-actions";
 import { Project } from "@/lib/generated/prisma";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 export default function CmsHomePage() {
+  const { isSignedIn } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isSignedIn) {
+      router.replace("/login");
+    }
+  }, [isSignedIn, router]);
+
   const [projects, setProjects] = useState<Project[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
@@ -79,22 +90,26 @@ export default function CmsHomePage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64 bg-">
-        <Loader2 className="h-10 w-10 animate-spin" />
+      <div className="flex flex-col items-center justify-center h-64">
+        <Loader2 className="h-10 w-10 animate-spin text-blue-500 mb-4" />
+        <span className="text-gray-500 text-lg">Loading projects...</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div>
-        <Card>
-          <CardContent>
-            <div>
-              <h3>Something went wrong</h3>
-              <p>
-                we couldn&#39;t load the project at this time.Please try again
-                later
+      <div className="flex flex-col items-center justify-center h-64">
+        <Card className="w-full max-w-md shadow-lg">
+          <CardContent className="flex flex-col items-center">
+            <div className="text-center mb-4">
+              <h3 className="text-xl font-semibold text-red-600 mb-2">
+                Something went wrong
+              </h3>
+              <p className="text-gray-500">
+                We couldn&apos;t load the projects at this time.
+                <br />
+                Please try again later.
               </p>
             </div>
             <Button onClick={() => window.location.reload()} variant="outline">
@@ -107,11 +122,11 @@ export default function CmsHomePage() {
   }
 
   return (
-    <div className="container mx-auto py-8 my-6">
+    <div className="container m-10 my-28">
       <Card>
         <CardHeader className="flex flex-row justify-between items-center">
           <div>
-            <CardTitle className="font-bold text-2xl my-2">
+            <CardTitle className="font-bold text-3xl my-2">
               Content Management System
             </CardTitle>
             <p>CMS manage content easily and efficiently.</p>
@@ -123,13 +138,13 @@ export default function CmsHomePage() {
           </Button>
         </CardHeader>
 
-        <CardContent className="flex flex-col text-black">
-          <div className="flex items-center space-x-2 mb-4">
+        <CardContent className="flex flex-col text-white">
+          <div className="flex items-center space-x-1 mb-4">
             <Button onClick={handleSearch}>
               <Search className="w-4 h-4" />
             </Button>
             <Input
-              placeholder="Search books..."
+              placeholder="Search Projects..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="max-w-sm"
@@ -164,11 +179,13 @@ export default function CmsHomePage() {
           ))}
 
           {/* Filtered Projects Message */}
-          {filteredProjects.length === 0 && projects.length > 0 && (
-            <div className="text-center text-gray-400 mt-6">
-              No projects found matching your search.
-            </div>
-          )}
+          {filteredProjects.length === 0 &&
+            projects.length > 0 &&
+            searchTerm && (
+              <div className="text-center text-gray-400 mt-6">
+                No projects found matching your search.
+              </div>
+            )}
 
           {/* No Projects Message */}
           {projects.length === 0 && (

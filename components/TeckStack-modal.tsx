@@ -36,6 +36,7 @@ const TechStackModal: React.FC<TechStackModalProp> = ({
 }) => {
   const [formData, setFormData] = useState({
     name: "",
+    color: "",
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -43,6 +44,7 @@ const TechStackModal: React.FC<TechStackModalProp> = ({
     if (isOpen) {
       setFormData({
         name: techStack?.name || "",
+        color: techStack?.color || "",
       });
     }
   }, [isOpen, setFormData]);
@@ -63,6 +65,7 @@ const TechStackModal: React.FC<TechStackModalProp> = ({
       const response = await updateTechStack({
         id: techStack.id,
         name: formData.name,
+        color: formData.color,
       });
       if (response.error) {
         toast.error(response.error);
@@ -84,7 +87,11 @@ const TechStackModal: React.FC<TechStackModalProp> = ({
     validateForm();
     setIsLoading(true);
     try {
-      const response = await addTechStack({ id: "", name: formData.name });
+      const response = await addTechStack({
+        id: "",
+        name: formData.name,
+        color: formData.color,
+      });
       console.log(response);
       if (response.error) {
         toast.error(response.error);
@@ -145,7 +152,13 @@ const TechStackModal: React.FC<TechStackModalProp> = ({
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
         />
-
+        <Label htmlFor="color">Color</Label>
+        <Input
+          id="color"
+          type="text"
+          value={formData.color}
+          onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+        />
         <DialogFooter>
           <Button onClick={onClose} variant="outline" disabled={isLoading}>
             Cancel
