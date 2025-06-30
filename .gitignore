@@ -40,4 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-/lib/generated
+
+# ignore everything in lib/generated *except* the prisma folder
+/lib/generated/*
+!/lib/generated/prisma
