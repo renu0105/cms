@@ -43,4 +43,3 @@ next-env.d.ts
 
 # ignore everything in lib/generated *except* the prisma folder
 /lib/generated/*
-!/lib/generated/prisma
